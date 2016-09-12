@@ -14,12 +14,12 @@ public class Stage2 {
         li = mi.get(32, 64);
         ri = mi.get(0, 32);
 
-        innerF(ri, key);
+        feistelFunction(ri, key);
 
         return mi;
     }
 
-    public BitSet innerF(BitSet ri, BitSet key){
+    public BitSet feistelFunction(BitSet ri, BitSet key){
 
         //Expansion
         int [] E = {32, 1, 2, 3, 4, 5,
@@ -56,15 +56,22 @@ public class Stage2 {
         return permRi;
     }
 
-    public void rounds (BitSet m0, List<BitSet> keys) {
+    public void rounds (BitSet m0, BitSet [] keys) {
 
-        for (int i = 0; i < 16; i++) {
-            m0 = round(m0, keys.get(i));
+        for (int i = 0; i < keys.length; i++) {
+            m0 = round(m0, keys[i]);
         }
     }
 
     public static void main (String[] args)
     {
+        KeyGenerator keyGenerator = new KeyGenerator();
+        BitSet initialKey = BitSet.valueOf("0123456789abcdef".getBytes());
+        BitSet partialMessage = BitSet.valueOf("thisIsJustATest1".getBytes());
+        BitSet [] subkeys = keyGenerator.generateKeys(initialKey);
 
+        Stage2 stage2 = new Stage2();
+
+        stage2.rounds(partialMessage, subkeys);
     }
 }
