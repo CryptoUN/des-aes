@@ -1,9 +1,7 @@
 
 package des;
 
-import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.List;
 
 public class Stage2 {
 
@@ -75,17 +73,12 @@ public class Stage2 {
             19, 13, 30, 6, 22, 11, 4, 25};
 
 
-    public BitSet round(BitSet key, BitSet mi) {
+    public void round(BitSet key, BitSet li, BitSet ri) {
 
-        BitSet li = new BitSet(32);
-        BitSet ri = new BitSet(32);
-
-        li = mi.get(32, 64);
-        ri = mi.get(0, 32);
-
-        feistelFunction(ri, key);
-
-        return mi;
+        BitSet fi = feistelFunction(ri, key);
+        li.xor(fi);
+        li = (BitSet) ri.clone();
+        ri = li;
     }
 
     public BitSet feistelFunction(BitSet ri, BitSet key) {
@@ -137,11 +130,27 @@ public class Stage2 {
         return num;
     }
 
-    public void rounds(BitSet m0, BitSet[] keys) {
+    public BitSet rounds(BitSet m0, BitSet[] keys) {
+
+        BitSet li, ri, result = new BitSet(64);
+
+        li = m0.get(0, 32);
+        ri = m0.get(32, 64);
 
         for (int i = 0; i < keys.length; i++) {
-            m0 = round(m0, keys[i]);
+            round(keys[i], li, ri);
         }
+
+
+        for (int i = 0; i < ri.length(); i++) {
+            result.set(i, ri.get(i));
+        }
+
+        for (int i = 0; i < li.length(); i++) {
+            result.set(32 + i, li.get(i));
+        }
+
+        return result;
     }
 
     public static void main(String[] args) {
