@@ -73,7 +73,7 @@ public class Stage2 {
             19, 13, 30, 6, 22, 11, 4, 25};
 
 
-    public void round(BitSet key, BitSet li, BitSet ri) {
+    public static void round(BitSet key, BitSet li, BitSet ri) {
 
         BitSet fi = feistelFunction(ri, key);
         li.xor(fi);
@@ -81,13 +81,13 @@ public class Stage2 {
         ri = li;
     }
 
-    public BitSet feistelFunction(BitSet ri, BitSet key) {
+    public static BitSet feistelFunction(BitSet ri, BitSet key) {
 
         BitSet expandedRi = new BitSet(48);
 
         //Expansion
         for (int i = 0; i < E.length; i++) {
-            expandedRi.set(i, ri.get(E[i]));
+            expandedRi.set(i, ri.get(E[i] - 1));
         }
 
         expandedRi.xor(key);
@@ -101,7 +101,7 @@ public class Stage2 {
         for (int i = 0, s = 0; i < expandedRi.length(); i += 6, s++) {
             row = (expandedRi.get(i) ? 2 : 0) + (expandedRi.get(i + 5) ? 1 : 0);
             col = bitSetToInt(expandedRi.get(i + 1, i + 5));
-            BitSet output = BitSet.valueOf(new long[]{SBoxes[s][row][col]});
+            BitSet output = BitSet.valueOf(new long[]{SBoxes[s][row][col] - 1});
             for (int j = 0; j < output.length(); j++) {
                 subRi.set(s * 4 + j, output.get(j));
             }
@@ -111,7 +111,7 @@ public class Stage2 {
 
         //Permutation
         for (int i = 0; i < P.length; i++) {
-            permRi.set(i, subRi.get(P[i]));
+            permRi.set(i, subRi.get(P[i] - 1));
         }
 
         return permRi;
@@ -130,7 +130,7 @@ public class Stage2 {
         return num;
     }
 
-    public BitSet rounds(BitSet m0, BitSet[] keys) {
+    public static BitSet rounds(BitSet m0, BitSet[] keys) {
 
         BitSet li, ri, result = new BitSet(64);
 
@@ -153,14 +153,4 @@ public class Stage2 {
         return result;
     }
 
-    public static void main(String[] args) {
-        KeyGenerator keyGenerator = new KeyGenerator();
-        BitSet initialKey = BitSet.valueOf("0123456789abcdef".getBytes());
-        BitSet partialMessage = BitSet.valueOf("thisIsJustATest1".getBytes());
-        BitSet[] subkeys = keyGenerator.generateKeys(initialKey);
-
-        Stage2 stage2 = new Stage2();
-
-        stage2.rounds(partialMessage, subkeys);
-    }
 }
