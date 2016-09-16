@@ -1,6 +1,8 @@
 
 package des;
 
+import util.Util;
+
 import java.util.BitSet;
 
 public class Stage2 {
@@ -100,7 +102,7 @@ public class Stage2 {
 
         for (int i = 0, s = 0; i < expandedRi.length(); i += 6, s++) {
             row = (expandedRi.get(i) ? 2 : 0) + (expandedRi.get(i + 5) ? 1 : 0);
-            col = bitSetToInt(expandedRi.get(i + 1, i + 5));
+            col = Util.bitSetToInt(expandedRi.get(i + 1, i + 5));
             BitSet output = BitSet.valueOf(new long[]{SBoxes[s][row][col] - 1});
             for (int j = 0; j < output.length(); j++) {
                 subRi.set(s * 4 + j, output.get(j));
@@ -115,19 +117,6 @@ public class Stage2 {
         }
 
         return permRi;
-    }
-
-    public static int bitSetToInt(BitSet bitSet) {
-        int num = 0, i = 0;
-
-        while (bitSet.nextSetBit(i) > 0) {
-            i = bitSet.nextSetBit(i);
-            num |= (1 << i);
-            i++;
-        }
-
-        num &= Integer.MAX_VALUE;
-        return num;
     }
 
     public static BitSet rounds(BitSet m0, BitSet[] keys) {

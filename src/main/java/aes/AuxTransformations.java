@@ -1,5 +1,7 @@
 package aes;
 
+import util.Util;
+
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.stream.IntStream;
@@ -62,15 +64,6 @@ public class AuxTransformations {
         return matrix;
     }
 
-    static String convertBitSetToString(BitSet bitString, int n) {
-        final StringBuilder buffer = new StringBuilder(n);
-        IntStream.range(0, n)
-                .map(i -> n - i - 1)
-                .mapToObj(i -> bitString.get(i) ? '1' : '0')
-                .forEach(buffer::append);
-        return buffer.toString();
-    }
-
     public static void main(String[] args) {
         int[] originalArray = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         int[][] matrix = convertToMatrix(originalArray, 4, 4);
@@ -81,11 +74,11 @@ public class AuxTransformations {
 
         long[] merged = mergeIntoLong(transpose, transpose.length);
         System.out.println(Arrays.toString(merged));
-        System.out.println(convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][0]}), 8) + "-"
-                + convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][1]}), 8) + "-"
-                + convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][2]}), 8) + "-"
-                + convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][3]}), 8));
-        System.out.println(convertBitSetToString(BitSet.valueOf(new long[]{merged[0]}), 32));
+        System.out.println(Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][0]}), 8) + "-"
+                + Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][1]}), 8) + "-"
+                + Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][2]}), 8) + "-"
+                + Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][3]}), 8));
+        System.out.println(Util.convertBitSetToString(BitSet.valueOf(new long[]{merged[0]}), 32));
 
         System.out.println("\nTesting addRoundKey\n");
         BitSet[] message = {
@@ -107,7 +100,7 @@ public class AuxTransformations {
         System.out.println();
 
         for (BitSet bitSet : result) {
-            System.out.println(convertBitSetToString(bitSet, 32));
+            System.out.println(Util.convertBitSetToString(bitSet, 32));
         }
     }
 

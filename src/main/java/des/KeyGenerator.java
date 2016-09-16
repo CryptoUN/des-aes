@@ -1,5 +1,7 @@
 package des;
 
+import util.Util;
+
 import java.util.BitSet;
 import java.util.stream.IntStream;
 
@@ -40,16 +42,9 @@ public class KeyGenerator {
         for (int i = 0; i < 16; ++i) {
             C_i = leftShift(C_i, i, 28);
             D_i = leftShift(D_i, i, 28);
-            subKeys[i] = getPC2(concatenateBitStrings(C_i, D_i, 56));
+            subKeys[i] = getPC2(Util.concatenateBitStrings(C_i, D_i, 56));
         }
         return subKeys;
-    }
-
-    private static BitSet concatenateBitStrings(BitSet leftBitString, BitSet rightBitString, int n) {
-        long left = (leftBitString.length() != 0) ? leftBitString.toLongArray()[0] : 0;
-        long right = (rightBitString.length() != 0) ? rightBitString.toLongArray()[0] : 0;
-        long concatenated = (left << n/2) | right;
-        return BitSet.valueOf(new long[]{concatenated});
     }
 
     private static BitSet getPC1(BitSet key) {
@@ -87,30 +82,21 @@ public class KeyGenerator {
         return shiftedBitString;
     }
 
-    private static String convertBitSetToString(BitSet bitString, int n) {
-        final StringBuilder buffer = new StringBuilder(n);
-        IntStream.range(0, n)
-                .map(i -> n - i - 1)
-                .mapToObj(i -> bitString.get(i) ? '1' : '0')
-                .forEach(buffer::append);
-        return buffer.toString();
-    }
-
-    public static void main(String[] args) {
+     public static void main(String[] args) {
         long keyNumber = -1L;
         BitSet bitKey = BitSet.valueOf(new long[]{keyNumber});
-        System.out.println(convertBitSetToString(leftShift(bitKey, 2, 64), 64));
-        System.out.println(convertBitSetToString(leftShift(bitKey, 3, 64), 64));
+        System.out.println(Util.convertBitSetToString(leftShift(bitKey, 2, 64), 64));
+        System.out.println(Util.convertBitSetToString(leftShift(bitKey, 3, 64), 64));
 
         BitSet pc1 = getPC1(bitKey);
 //        BitSet pc1 = getPC1(leftShift(bitKey, 2));
-        System.out.println(convertBitSetToString(pc1, 56));
-        System.out.println(convertBitSetToString(getPC2(pc1), 48));
+        System.out.println(Util.convertBitSetToString(pc1, 56));
+        System.out.println(Util.convertBitSetToString(getPC2(pc1), 48));
 
         System.out.println("\nGenerated keys\n");
         BitSet[] keys = generateKeys(bitKey);
         for (BitSet key : keys)
-            System.out.println(convertBitSetToString(key, 48));
+            System.out.println(Util.convertBitSetToString(key, 48));
     }
 
 }
