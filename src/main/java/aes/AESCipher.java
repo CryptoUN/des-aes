@@ -1,5 +1,7 @@
 package aes;
 
+import util.Util;
+
 import java.util.BitSet;
 
 /**
@@ -42,7 +44,7 @@ public class AESCipher {
         AESCipher aesCipher = new AESCipher();
         BitSet[] preparedMessage = aesCipher.prepareMessage(asciiArray);
         for (BitSet bitSet : preparedMessage) {
-            System.out.println(AuxTransformations.convertBitSetToString(bitSet, 32));
+            System.out.println(Util.convertBitSetToString(bitSet, 32));
         }
     }
 
