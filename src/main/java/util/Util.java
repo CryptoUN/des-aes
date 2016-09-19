@@ -24,8 +24,9 @@ public class Util {
     public static int bitSetToInt(BitSet bitSet) {
         int num = 0, i = 0;
 
-        while (bitSet.nextSetBit(i) > 0) {
+        while (true) {
             i = bitSet.nextSetBit(i);
+            if(i < 0) break;
             num |= (1 << i);
             i++;
         }

@@ -3,6 +3,7 @@ package des;
 
 import util.Util;
 
+import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
 
 public class Stage2 {
@@ -75,21 +76,13 @@ public class Stage2 {
             19, 13, 30, 6, 22, 11, 4, 25};
 
 
-    public static void round(BitSet key, BitSet li, BitSet ri) {
-
-        BitSet fi = feistelFunction(ri, key);
-        li.xor(fi);
-        li = (BitSet) ri.clone();
-        ri = li;
-    }
-
     public static BitSet feistelFunction(BitSet ri, BitSet key) {
 
         BitSet expandedRi = new BitSet(48);
 
         //Expansion
         for (int i = 0; i < E.length; i++) {
-            expandedRi.set(i, ri.get(E[i] - 1));
+            expandedRi.set(47 - i, ri.get(32 - E[i]));
         }
 
         expandedRi.xor(key);
@@ -100,12 +93,12 @@ public class Stage2 {
         int[][][] SBoxes = {S1, S2, S3, S4, S5, S6, S7, S8};
         int row, col;
 
-        for (int i = 0, s = 0; i < expandedRi.length(); i += 6, s++) {
-            row = (expandedRi.get(i) ? 2 : 0) + (expandedRi.get(i + 5) ? 1 : 0);
+        for (int i = 0, s = 7; i < expandedRi.length(); i += 6, s--) {
+            row = (expandedRi.get(i) ? 1 : 0) + (expandedRi.get(i + 5) ? 2 : 0);
             col = Util.bitSetToInt(expandedRi.get(i + 1, i + 5));
-            BitSet output = BitSet.valueOf(new long[]{SBoxes[s][row][col] - 1});
+            BitSet output = BitSet.valueOf(new long[]{SBoxes[s][row][col]});
             for (int j = 0; j < output.length(); j++) {
-                subRi.set(s * 4 + j, output.get(j));
+                subRi.set((7 - s)* 4 + j, output.get(j));
             }
         }
 
@@ -113,7 +106,7 @@ public class Stage2 {
 
         //Permutation
         for (int i = 0; i < P.length; i++) {
-            permRi.set(i, subRi.get(P[i] - 1));
+            permRi.set(31 - i, subRi.get(32 - P[i]));
         }
 
         return permRi;
@@ -123,13 +116,16 @@ public class Stage2 {
 
         BitSet li, ri, result = new BitSet(64);
 
-        li = m0.get(0, 32);
-        ri = m0.get(32, 64);
+        li = m0.get(32, 64);
+        ri = m0.get(0, 32);
 
         for (int i = 0; i < keys.length; i++) {
-            round(keys[i], li, ri);
+            BitSet fi = feistelFunction(ri, keys[i]);
+            BitSet temp = (BitSet) ri.clone();
+            ri = (BitSet) li.clone();
+            ri.xor(fi);
+            li = temp;
         }
-
 
         for (int i = 0; i < ri.length(); i++) {
             result.set(i, ri.get(i));
@@ -140,6 +136,29 @@ public class Stage2 {
         }
 
         return result;
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+
+        //Round 16
+        String sm ="1100110000000000110011001111111111110000101010101111000010101010";
+        String sKey = "000110110000001011101111111111000111000001110010";
+        BitSet m = new BitSet(64);
+        BitSet [] key = {new BitSet(64)};
+
+        for(int i  = 63, j = 0; i >= 0; i--, j++){
+            m.set(i, sm.charAt(j) == '1');
+        }
+
+        for(int i  = 47, j = 0; i >= 0; i--, j++){
+            key[0].set(i, (sKey.charAt(j) == '1'));
+        }
+
+
+        System.out.println("m "+Util.convertBitSetToString(m, 64));
+
+        BitSet res = Stage2.rounds(m, key);
+        System.out.println("r16l16 "+Util.convertBitSetToString(res, 64));
     }
 
 }
