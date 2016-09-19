@@ -114,7 +114,7 @@ public class Stage2 {
 
     public static BitSet rounds(BitSet m0, BitSet[] keys) {
 
-        BitSet li, ri, result = new BitSet(64);
+        BitSet li, ri, result;
 
         li = m0.get(32, 64);
         ri = m0.get(0, 32);
@@ -127,13 +127,10 @@ public class Stage2 {
             li = temp;
         }
 
-        for (int i = 0; i < ri.length(); i++) {
-            result.set(i, ri.get(i));
-        }
+        System.out.println("li " + Util.convertBitSetToString(li, 32));
+        System.out.println("ri " + Util.convertBitSetToString(ri, 32));
 
-        for (int i = 0; i < li.length(); i++) {
-            result.set(32 + i, li.get(i));
-        }
+        result = Util.concatenateBitStrings(ri, li, 64);
 
         return result;
     }
@@ -141,8 +138,8 @@ public class Stage2 {
     public static void main(String[] args) throws UnsupportedEncodingException {
 
         //Round 16
-        String sm ="1100110000000000110011001111111111110000101010101111000010101010";
-        String sKey = "000110110000001011101111111111000111000001110010";
+        String sm ="1100001010001100100101100000110101000011010000100011001000110100";
+        String sKey = "110010110011110110001011000011100001011111110101";
         BitSet m = new BitSet(64);
         BitSet [] key = {new BitSet(64)};
 
@@ -156,9 +153,10 @@ public class Stage2 {
 
 
         System.out.println("m "+Util.convertBitSetToString(m, 64));
-
         BitSet res = Stage2.rounds(m, key);
-        System.out.println("r16l16 "+Util.convertBitSetToString(res, 64));
+        BitSet ciphertext = DES.finalPermutation(res);
+
+        System.out.println("ciphertext "+Util.convertBitSetToString(ciphertext, 64));
     }
 
 }

@@ -1,5 +1,7 @@
 package des;
 
+import util.Util;
+
 import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
 
@@ -17,10 +19,10 @@ public class DES {
 
     public static BitSet initialPermutation(BitSet message) {
 
-        BitSet permMessage = new BitSet(message.length());
+        BitSet permMessage = new BitSet(64);
 
         for (int i = 0; i < IP.length; i++) {
-            permMessage.set(i, message.get(IP[i] - 1));
+            permMessage.set(63 - i, message.get(64 - IP[i]));
         }
 
         return permMessage;
@@ -31,7 +33,7 @@ public class DES {
         BitSet ciphertext = new BitSet(mi.length());
 
         for (int i = 0; i < IP.length; i++) {
-            ciphertext.set(IP[i] - 1, mi.get(i));
+            ciphertext.set(64 - IP[i], mi.get(63 - i));
         }
 
         return ciphertext;
@@ -46,10 +48,15 @@ public class DES {
         return ciphertext;
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
-        BitSet initialKey = BitSet.valueOf("0123456789abcdef".getBytes("UTF-8"));
-        BitSet message = BitSet.valueOf("thisIsJustATest1".getBytes("UTF-8"));
+    public static BitSet decrypt(BitSet ciphertext, BitSet key) {
+        ciphertext = initialPermutation(ciphertext);
+        BitSet [] subkeys = KeyGenerator.generateKeys(key);
+        BitSet plaintext = finalPermutation(Stage2.rounds(ciphertext, subkeys));
 
-        BitSet ciphertext = DES.encrypt(message, initialKey);
+        return plaintext;
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+   
     }
 }
