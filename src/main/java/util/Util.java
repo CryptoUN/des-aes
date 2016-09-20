@@ -5,11 +5,15 @@ import java.util.stream.IntStream;
 
 public class Util {
 
-    public static BitSet concatenateBitStrings(BitSet leftBitString, BitSet rightBitString, int n) {
-        long left = (leftBitString.length() != 0) ? leftBitString.toLongArray()[0] : 0;
-        long right = (rightBitString.length() != 0) ? rightBitString.toLongArray()[0] : 0;
-        long concatenated = (left << n/2) | right;
-        return BitSet.valueOf(new long[]{concatenated});
+    public static BitSet concatenateBitStrings(BitSet left, BitSet right, int n) {
+        BitSet total = new BitSet(n);
+
+        for(int i = 0; i < n/2 ; i++) {
+            total.set(i, right.get(i));
+            total.set(i + n/2, left.get(i));
+        }
+
+        return total;
     }
 
     public static String convertBitSetToString(BitSet bitString, int n) {
