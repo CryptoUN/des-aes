@@ -5,9 +5,7 @@ import util.Util;
 import java.util.BitSet;
 import java.util.stream.IntStream;
 
-/**
- * Created by oscar on 2/09/16.
- */
+
 public class KeyGenerator {
 
     // Subtract 1 to get the correct position
@@ -37,27 +35,29 @@ public class KeyGenerator {
     public static BitSet[] generateKeys(BitSet initialKey) {
         BitSet[] subKeys = new BitSet[16];
         BitSet pc1Output = getPC1(initialKey);
-        BitSet C_i = pc1Output.get(0, 28);
-        BitSet D_i = pc1Output.get(28, 56);
-        for (int i = 0; i < 16; ++i) {
+        BitSet C_i = pc1Output.get(28, 56);
+        BitSet D_i = pc1Output.get(0, 28);
+
+        for (int i = 1; i <= 16; ++i) {
+
             C_i = leftShift(C_i, i, 28);
             D_i = leftShift(D_i, i, 28);
-            subKeys[i] = getPC2(Util.concatenateBitStrings(C_i, D_i, 56));
+            subKeys[i - 1] = getPC2(Util.concatenateBitStrings(C_i, D_i, 56));
         }
         return subKeys;
     }
 
     private static BitSet getPC1(BitSet key) {
         BitSet pc1 = new BitSet(56);
-        for (int i = 0; i < PC1.length; ++i)
-            pc1.set(55 - i, key.get(PC1[i] - 1));
+        for (int i = 0; i < PC1.length; i++)
+            pc1.set(55 - i, key.get(64 - PC1[i]));
         return pc1;
     }
 
     private static BitSet getPC2(BitSet subKey) {
         BitSet pc2 = new BitSet(48);
         for (int i = 0; i < PC2.length; ++i)
-            pc2.set(47 - i, subKey.get(PC2[i] - 1));
+            pc2.set(47 - i, subKey.get(56 - PC2[i]));
         return pc2;
     }
 
@@ -72,26 +72,25 @@ public class KeyGenerator {
             case 2:
             case 9:
             case 16:
-                shiftedKey = (key << n - 1) | (key >>> 1);
+                shiftedKey = (key << 1)|(key >> (n - 1));
                 shiftedBitString = BitSet.valueOf(new long[]{shiftedKey});
                 break;
             default:
-                shiftedKey = (key << n - 2) | (key >>> 2);
+                shiftedKey = (key << 2)|(key >> (n - 2));
                 shiftedBitString = BitSet.valueOf(new long[]{shiftedKey});
         }
         return shiftedBitString;
     }
 
      public static void main(String[] args) {
-        long keyNumber = -1L;
+        long keyNumber = 1383827165325090801L; //133457799BBCDFF1 in hex
         BitSet bitKey = BitSet.valueOf(new long[]{keyNumber});
+        System.out.println("key " +Util.convertBitSetToString(bitKey, 64));
         System.out.println(Util.convertBitSetToString(leftShift(bitKey, 2, 64), 64));
         System.out.println(Util.convertBitSetToString(leftShift(bitKey, 3, 64), 64));
 
         BitSet pc1 = getPC1(bitKey);
-//        BitSet pc1 = getPC1(leftShift(bitKey, 2));
-        System.out.println(Util.convertBitSetToString(pc1, 56));
-        System.out.println(Util.convertBitSetToString(getPC2(pc1), 48));
+        System.out.println("pc1 " + Util.convertBitSetToString(pc1, 56));
 
         System.out.println("\nGenerated keys\n");
         BitSet[] keys = generateKeys(bitKey);
