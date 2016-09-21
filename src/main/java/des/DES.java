@@ -30,8 +30,8 @@ public class DES {
 
     public static BitSet finalPermutation(BitSet mi) {
 
-        BitSet ciphertext = new BitSet(mi.length());
-
+        BitSet ciphertext = new BitSet(64);
+        System.out.println("pre ciphe final pr " + Util.convertBitSetToString(mi, 64));
         for (int i = 0; i < IP.length; i++) {
             ciphertext.set(64 - IP[i], mi.get(63 - i));
         }
@@ -43,6 +43,7 @@ public class DES {
 
         message = initialPermutation(message);
         BitSet [] subkeys = KeyGenerator.generateKeys(key);
+        System.out.println("initial perm " + Util.convertBitSetToString(message, 64));
         BitSet ciphertext = finalPermutation(Stage2.rounds(message, subkeys));
 
         return ciphertext;
@@ -51,12 +52,35 @@ public class DES {
     public static BitSet decrypt(BitSet ciphertext, BitSet key) {
         ciphertext = initialPermutation(ciphertext);
         BitSet [] subkeys = KeyGenerator.generateKeys(key);
+
+        BitSet li, ri;
+
+        System.out.println("per ciphe " + Util.convertBitSetToString(ciphertext, 64));
+        li = ciphertext.get(32, 64);
+        ri = ciphertext.get(0, 32);
+
+        System.out.println("li " + Util.convertBitSetToString(li, 32));
+        System.out.println("ri " + Util.convertBitSetToString(ri, 32));
+
+        ciphertext = Util.concatenateBitStrings(ri, li, 64);
+        System.out.println("con ciphe " + Util.convertBitSetToString(ciphertext, 64));
+
         BitSet plaintext = finalPermutation(Stage2.rounds(ciphertext, subkeys));
 
         return plaintext;
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-   
+        long keyNumber = 4267328009278650206L; //3b3898371520f75e in hex
+        BitSet initialKey = BitSet.valueOf(new long[]{keyNumber});
+        System.out.println("size key in bits " + initialKey.size());
+        System.out.println("key " + Util.convertBitSetToString(initialKey, initialKey.size()));
+        long messageNumber = 81985529216486895L; //0123456789ABCDEF in hex
+        BitSet message = BitSet.valueOf(new long[]{messageNumber});
+        System.out.println("message "+Util.convertBitSetToString(message, message.size()));
+        System.out.println("size m in bits " + message.size());
+        BitSet ciphertext = DES.encrypt(message, initialKey);
+
+        System.out.println("ciphertext  "+Util.convertBitSetToString(ciphertext, ciphertext.size()));
     }
 }

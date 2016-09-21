@@ -93,7 +93,7 @@ public class Stage2 {
         int[][][] SBoxes = {S1, S2, S3, S4, S5, S6, S7, S8};
         int row, col;
 
-        for (int i = 0, s = 7; i < expandedRi.length(); i += 6, s--) {
+        for (int i = 0, s = 7; i < 48; i += 6, s--) {
             row = (expandedRi.get(i) ? 1 : 0) + (expandedRi.get(i + 5) ? 2 : 0);
             col = Util.bitSetToInt(expandedRi.get(i + 1, i + 5));
             BitSet output = BitSet.valueOf(new long[]{SBoxes[s][row][col]});
@@ -126,9 +126,6 @@ public class Stage2 {
             ri.xor(fi);
             li = temp;
         }
-
-        System.out.println("li " + Util.convertBitSetToString(li, 32));
-        System.out.println("ri " + Util.convertBitSetToString(ri, 32));
 
         result = Util.concatenateBitStrings(ri, li, 64);
 
