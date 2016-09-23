@@ -3,10 +3,7 @@ package des;
 import util.Util;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class DES {
 
@@ -62,19 +59,32 @@ public class DES {
         return plaintext;
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
-        long keyNumber = 4267328009278650206L; //3b3898371520f75e in hex
-        BitSet initialKey = BitSet.valueOf(new long[]{keyNumber});
+    public static void main(String[] args) {
+
+        BitSet initialKey = BitSet.valueOf("12'a´wdá".getBytes());
+        BitSet message = BitSet.valueOf("éxïto".getBytes());
 
         System.out.println("key " + Util.convertBitSetToString(initialKey, 64));
-        long messageNumber = 81985529216486895L; //0123456789ABCDEF in hex
-        BitSet message = BitSet.valueOf(new long[]{messageNumber});
         System.out.println("message "+Util.convertBitSetToString(message, 64));
 
+        //Encrypts
         BitSet ciphertext = DES.encrypt(message, initialKey);
-        System.out.println("ciphertext  "+Util.convertBitSetToString(ciphertext, 64));
+        String textCiphertext = Base64.getEncoder().encodeToString(ciphertext.toByteArray());
 
-        BitSet plaintext = DES.decrypt(ciphertext, initialKey);
+        System.out.println("ciphertext  "+Util.convertBitSetToString(ciphertext, 64));
+        System.out.println("text cipher " + textCiphertext);
+
+        //Decrypts using text version of ciphertext
+        BitSet bitStringText_ciphertext = BitSet.valueOf(Base64.getDecoder().decode(textCiphertext));
+        BitSet plaintext = DES.decrypt(bitStringText_ciphertext, initialKey);
         System.out.println("decrypted plaintext "+Util.convertBitSetToString(plaintext, 64));
+        System.out.println("text plaintext " + new String(plaintext.toByteArray()));
+
+        /*
+        //Decrypts directly with BitSet
+        plaintext = DES.decrypt(ciphertext, initialKey);
+        System.out.println("decrypted plaintext "+Util.convertBitSetToString(plaintext, 64));
+        System.out.println("text plaintext " + new String(plaintext.toByteArray()));
+        */
     }
 }
