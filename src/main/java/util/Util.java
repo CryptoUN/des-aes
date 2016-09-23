@@ -17,11 +17,10 @@ public class Util {
     }
 
     public static String convertBitSetToString(BitSet bitString, int n) {
-        final StringBuilder buffer = new StringBuilder(n);
-        IntStream.range(0, n)
-                .map(i -> n - i - 1)
-                .mapToObj(i -> bitString.get(i) ? '1' : '0')
-                .forEach(buffer::append);
+        final StringBuilder buffer = new StringBuilder();
+        for(int i  = n  - 1; i >= 0; i--){
+            buffer.append(bitString.get(i)? '1': '0');
+        }
         return buffer.toString();
     }
 
