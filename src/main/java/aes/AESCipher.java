@@ -6,6 +6,13 @@ import java.util.Arrays;
 public class AESCipher {
 
     /**
+     * Specifies the key schedule
+     */
+    public enum Type {
+        AES128, AES192, AES256
+    }
+
+    /**
      *
      * @param message - An array containing the numerical codes of the message. Its length must be 128.
      * @return bitSetsMessage - The bit sets with the correct order for using AES.
