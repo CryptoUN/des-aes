@@ -1,14 +1,8 @@
 package aes;
 
-import util.Util;
-
 import java.util.Arrays;
-import java.util.BitSet;
-import java.util.stream.IntStream;
 
-/**
- * Created by oscar on 11/09/16.
- */
+
 public class AuxTransformations {
 
     /**
@@ -17,31 +11,12 @@ public class AuxTransformations {
      * @param key
      * @return XORed message with key.
      */
-    static BitSet[] addRoundKey(BitSet[] message, BitSet[] key) {
+    static int[][] addRoundKey(int[][] message, int[][] key) {
         for (int i = 0; i < message.length; i++) {
-            message[i].xor(key[i]);
+            for (int j = 0; j < message.length; j++)
+                message[i][j] ^= key[i][j];
         }
         return message;
-    }
-
-    static BitSet[] convertToBitSet(long[] array) {
-        BitSet[] bitSets = new BitSet[array.length];
-        for (int i = 0; i < array.length; i++) {
-            bitSets[i] = BitSet.valueOf(new long[]{array[i]});
-        }
-        return bitSets;
-    }
-
-    static long[] mergeIntoLong(int[][] matrix, int n) {
-        long[] merged = new long[n];
-        for (int i = 0; i < n; i++) {
-            long section0 = matrix[i][3];
-            long section1 = matrix[i][2];
-            long section2 = matrix[i][1];
-            long section3 = matrix[i][0];
-            merged[i] = section3 << 24 | section2 << 16 | section1 << 8 | section0;
-        }
-        return merged;
     }
 
     static int[][] transpose(int[][] matrix) {
@@ -72,36 +47,14 @@ public class AuxTransformations {
         int[][] transpose = transpose(matrix);
         System.out.println(Arrays.deepToString(transpose));
 
-        long[] merged = mergeIntoLong(transpose, transpose.length);
-        System.out.println(Arrays.toString(merged));
-        System.out.println(Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][0]}), 8) + "-"
-                + Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][1]}), 8) + "-"
-                + Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][2]}), 8) + "-"
-                + Util.convertBitSetToString(BitSet.valueOf(new long[]{transpose[0][3]}), 8));
-        System.out.println(Util.convertBitSetToString(BitSet.valueOf(new long[]{merged[0]}), 32));
-
         System.out.println("\nTesting addRoundKey\n");
-        BitSet[] message = {
-            BitSet.valueOf(new long[]{123}),
-            BitSet.valueOf(new long[]{126}),
-            BitSet.valueOf(new long[]{923}),
-            BitSet.valueOf(new long[]{15423})
-        };
+        int[] message = {0x41, 0x45, 0x53, 0x20, 0x65, 0x73, 0x20, 0x6d, 0x75, 0x79, 0x20, 0x66, 0x61, 0x63, 0x69, 0x6c};
+        int[] key = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+        AESCipher aesCipher = new AESCipher();
 
-        BitSet[] key = {
-            BitSet.valueOf(new long[]{14875623}),
-            BitSet.valueOf(new long[]{-126}),
-            BitSet.valueOf(new long[]{94523}),
-            BitSet.valueOf(new long[]{1547723})
-        };
+        int[][] result = addRoundKey(aesCipher.prepareMessage(message), convertToMatrix(key, 4, 4));
 
-        BitSet[] result = addRoundKey(message, key);
-
-        System.out.println();
-
-        for (BitSet bitSet : result) {
-            System.out.println(Util.convertBitSetToString(bitSet, 32));
-        }
+        System.out.println(Arrays.deepToString(result));
     }
 
 }

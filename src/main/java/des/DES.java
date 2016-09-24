@@ -2,12 +2,11 @@ package des;
 
 import util.Util;
 
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 public class DES {
 
-    private static int [] IP = {
+    private static final int[] IP = {
             58, 50, 42, 34, 26, 18, 10, 2,
             60, 52, 44, 36, 28, 20, 12, 4,
             62, 54, 46, 38, 30, 22, 14, 6,
