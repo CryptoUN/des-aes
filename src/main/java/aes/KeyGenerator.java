@@ -12,19 +12,6 @@ public class KeyGenerator {
             0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
     };
 
-
-    public static int[] rotWord(int[] word) {
-
-        int temp = word[0];
-        for (int i = 0; i < word.length - 1; i++) {
-            word[i] = word[i + 1];
-        }
-
-        word[word.length - 1] = temp;
-        return word;
-    }
-
-
     public static int[] subWord(int[] word) {
 
         int row, col;
@@ -71,7 +58,7 @@ public class KeyGenerator {
 
             int[][] prevKey = roundKeys.get(i - 1);
 
-            roundKey[0] = subWord(rotWord(prevKey[n - 1].clone()));
+            roundKey[0] = subWord(AuxTransformations.rotateWord(prevKey[n - 1].clone(), 1));
             roundKey[0][0] ^= rcon[i];
 
             for (int j = 0; j < 4; j++) {

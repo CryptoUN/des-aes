@@ -40,7 +40,8 @@ public class AuxTransformations {
             {0x1F, 0xDD, 0xA8, 0x33, 0x88, 0x07, 0xC7, 0x31, 0xB1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xEC, 0x5F},
             {0x60, 0x51, 0x7F, 0xA9, 0x19, 0xB5, 0x4A, 0x0D, 0x2D, 0xE5, 0x7A, 0x9F, 0x93, 0xC9, 0x9C, 0xEF},
             {0xA0, 0xE0, 0x3B, 0x4D, 0xAE, 0x2A, 0xF5, 0xB0, 0xC8, 0xEB, 0xBB, 0x3C, 0x83, 0x53, 0x99, 0x61},
-            {0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D}};
+            {0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D}
+    };
 
     public static int[][] getSBox() {
         return sBox;
@@ -59,6 +60,14 @@ public class AuxTransformations {
         return message;
     }
 
+    /**
+     * Replace each byte in the state with the corresponding byte in S-Box.
+     * WARNING: modifies the original state.
+     *
+     * @param state
+     * @param inverse
+     * @return state
+     */
     static int[][] subBytes(int[][] state, boolean inverse) {
 
         int row, col;
@@ -72,6 +81,26 @@ public class AuxTransformations {
         }
         return state;
     }
+
+    /**
+     * Shifts every row in the matrix state n positions.
+     * WARNING: modifies the original state.
+     *
+     * @param state
+     * @param inverse
+     * @return Shifted state
+     */
+    static int[][] shiftRows(int[][] state, boolean inverse) {
+
+        int positions;
+        for (int i = 0; i < state.length; i++) {
+            positions = inverse ? 4 - i : i;
+            state[i] = rotateWord(state[i], positions);
+        }
+        return state;
+    }
+
+
 
     static int[][] transpose(int[][] matrix) {
         int[][] transpose = new int[matrix[0].length][matrix.length];
@@ -93,6 +122,20 @@ public class AuxTransformations {
         return matrix;
     }
 
+    public static int[] rotateWord(int[] word, int n) {
+        int[] rotated = new int[4];
+
+        for (int i = n, j = 0; i < 4; i++, j++) {
+            rotated[j] = word[i];
+        }
+
+        for (int i = 0, j = 4 - n; i < n; i++, j++) {
+            rotated[j] = word[i];
+        }
+
+        return rotated;
+    }
+
     public static void main(String[] args) {
         int[] originalArray = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         int[][] matrix = convertToMatrix(originalArray, 4, 4);
@@ -106,15 +149,19 @@ public class AuxTransformations {
         int[] key = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
         AESCipher aesCipher = new AESCipher();
         System.out.println("Message");
-        System.out.println(Arrays.deepToString(aesCipher.prepareMessage(message)));
+        int[][] messageMatrix = aesCipher.prepareMessage(message);
+        System.out.println(Arrays.deepToString(messageMatrix));
         System.out.println("key");
         System.out.println(Arrays.deepToString(aesCipher.prepareMessage(key)));
 
         int[][] result = addRoundKey(aesCipher.prepareMessage(message), aesCipher.prepareMessage(key));
 
         System.out.println(Arrays.deepToString(result));
+        System.out.println("ShiftRows");
 
-        System.out.println(Arrays.deepToString(AuxTransformations.subBytes(result, false)));
+        System.out.println(Arrays.deepToString(shiftRows(messageMatrix, true)));
+        System.out.println(Arrays.deepToString(shiftRows(messageMatrix, false)));
+
     }
 
 }
