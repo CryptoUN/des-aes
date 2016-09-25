@@ -27,6 +27,14 @@ public class KeyGenerator {
         return word;
     }
 
+    /**
+     * Generates the round keys
+     *
+     * @param initialKey: array of the original key
+     * @param type:       Type of Key schedule to be used according to the size of the key
+     * @return A list with the round keys
+     */
+
     public static List<int[][]> generate(int[] initialKey, AESCipher.Type type) {
 
         int n = 4, rounds = 10;
@@ -43,43 +51,47 @@ public class KeyGenerator {
                 rounds = 14;
         }
 
-        ArrayList<int[][]> roundKeys = new ArrayList<>();
+        int[][] roundKeys = new int[(rounds+1)*n][4];
 
         for (int i = 0; i <= rounds; i++) {
-
-            roundKeys.add(new int[n][4]);
-            int[][] roundKey = roundKeys.get(i);
 
             if (i == 0) {
                 for (int j = 0; j < n; j++) {
                     for (int k = 0; k < 4; k++) {
-                        roundKey[j][k] = initialKey[j * 4 + k];
+                        roundKeys[j][k] = initialKey[j * 4 + k];
                     }
                 }
                 continue;
             }
 
-            int[][] prevKey = roundKeys.get(i - 1);
+            roundKeys[i * n] = subWord(rotateWord(roundKeys[(i * n) - 1].clone(), 1));
+            roundKeys[i * n][0] ^= rcon[i];
 
-            roundKey[0] = subWord(rotateWord(prevKey[n - 1].clone(), 1));
-            roundKey[0][0] ^= rcon[i];
+            int[] temp = new int[4];
+            for (int j = i * n; j < (i + 1) * n && j < 60; j++) {
 
-            for (int j = 0; j < n; j++) {
+                if (j > 8 && j % n == 4) {
+                    temp = subWord(roundKeys[j - 1].clone());
+                }
+
                 for (int k = 0; k < 4; k++) {
-                    roundKey[j][k] ^= prevKey[j][k];
-
-                    if (j != 0) {
-                        roundKey[j][k] ^= roundKey[j - 1][k];
+                    roundKeys[j][k] ^= roundKeys[j - n][k];
+                    if (n == 8 && j > 8 && j % n == 4) {
+                        roundKeys[j][k] ^= temp[k];
+                    } else if (j % n != 0) {
+                        roundKeys[j][k] ^= roundKeys[j - 1][k];
                     }
                 }
             }
         }
 
-        for (int i = 0; i < roundKeys.size(); i++) {
-            roundKeys.set(i, transpose(roundKeys.get(i)));
+        List<int[][]> roundList = new ArrayList<>();
+
+        for (int i = 0; i <= rounds; i++) {
+            roundList.add(transpose(Arrays.copyOfRange(roundKeys, i * 4, (i+1) * 4)));
         }
 
-        return roundKeys;
+        return roundList;
     }
 
     public static void main(String[] args) {

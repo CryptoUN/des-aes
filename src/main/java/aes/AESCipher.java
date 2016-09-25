@@ -32,6 +32,15 @@ public class AESCipher {
         return matrix;
     }
 
+    /**
+     * Encrypts a message using AES with the provided key
+     *
+     * @param m:    an array of the message to be encrypted
+     * @param key:  an array of the key to use in the encryption
+     * @param type: Type of AES to be used according to the size
+     *              of the key AES-128, AES-192 or AES-256
+     * @return an array containing the ciphertext
+     */
     public static int[] encrypt(int[] m, int[] key, Type type) {
 
         int[][] message = prepareMessage(m);
@@ -51,7 +60,14 @@ public class AESCipher {
         return matrixToArray(transpose(state));
     }
 
-
+    /**
+     *  Decrypts a message using AES with the provided key
+     * @param c: an array of the ciphertext to be decrypted
+     * @param key: an array of the key to use for decrypt
+     * @param type: Type of AES to be used according to the size
+     *            of the key AES-128, AES-192 or AES-256
+     * @return an array containing the plaintext
+     */
     public static int[] decrypt(int[] c, int[] key, Type type) {
 
         int[][] ciphertext = prepareMessage(c);

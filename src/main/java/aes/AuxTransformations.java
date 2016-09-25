@@ -106,13 +106,13 @@ public class AuxTransformations {
     /**
      * XORs the message and the key. WARNING: modifies the original message.
      *
-     * @param message
-     * @param key
+     * @param message: matrix representation of the message or state
+     * @param key: matrix representation of the round key
      * @return XORed message with key.
      */
     static int[][] addRoundKey(int[][] message, int[][] key) {
-        for (int i = 0; i < message.length; i++) {
-            for (int j = 0; j < message.length; j++)
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++)
                 message[i][j] ^= key[i][j];
         }
         return message;
@@ -122,9 +122,9 @@ public class AuxTransformations {
      * Replace each byte in the state with the corresponding byte in S-Box.
      * WARNING: modifies the original state.
      *
-     * @param state
-     * @param inverse
-     * @return state
+     * @param state: matrix representing the values of each round
+     * @param inverse: Indicates if it is the inverse operation
+     * @return Substituted state
      */
     static int[][] subBytes(int[][] state, boolean inverse) {
 
@@ -144,8 +144,8 @@ public class AuxTransformations {
      * Shifts every row in the matrix state n positions.
      * WARNING: modifies the original state.
      *
-     * @param state
-     * @param inverse
+     * @param state: matrix representing the values of each round
+     * @param inverse: Indicates if it is the inverse operation
      * @return Shifted state
      */
     static int[][] shiftRows(int[][] state, boolean inverse) {
@@ -158,6 +158,13 @@ public class AuxTransformations {
         return state;
     }
 
+    /**
+     * Transforms the state matrix using a matrix multiplication in 𝐺𝐹(2^8).
+     *
+     * @param state:   matrix representing the values of each round
+     * @param inverse: Indicates if it is the inverse operation
+     * @return Transformed state
+     */
     static int[][] mixColumns(int[][] state, boolean inverse) {
 
         int[][] mult = new int[4][4];
