@@ -430,6 +430,15 @@ public class CFBMode {
         return bH.bsFromString(binaryString.toString());
     }
 
+    public static String retrievePlainMessage(String bitString) {
+        int[] intArray = bH.convertBitStringToIntArray(bitString);
+        StringBuilder plainMessage = new StringBuilder();
+        for (int i = 0; i < intArray.length; ++i) {
+            plainMessage.append((char) intArray[i]);
+        }
+        return plainMessage.toString();
+    }
+
     public static void main(String[] args) {
         CFBMode cfb = new CFBMode();
 //        BitSet bs1 = BitSet.valueOf(new long[]{0b1011000101001010L});
@@ -446,11 +455,10 @@ public class CFBMode {
         HashMap<String, String> cipherData;
         cipherData = encryptDES("Des es muy fácil");
         String plainText = decryptDES(cipherData);
-        System.out.println(plainText);
+        System.out.println(retrievePlainMessage(plainText));
 
         cipherData = encryptAES("AES es demaaaaaasiaaaaaadoooooo fácil asjkdnakjsdn", 128);
         plainText = decryptAES(cipherData, 128);
-        System.out.println(plainText);
     }
 
 }
