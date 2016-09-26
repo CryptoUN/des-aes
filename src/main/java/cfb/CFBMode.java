@@ -18,7 +18,7 @@ public class CFBMode {
 	public static final String PLAIN_TEXT = "plainText";
 	public static final String IV = "iv";
 	public static final String M_SIZE = "mSize";
-    public static final String KEY = "key"; // Original plain text message
+    public static final String KEY = "key";
 
     // Not final anymore to handle different sizes
 	public int N_SIZE = 4;
@@ -56,8 +56,6 @@ public class CFBMode {
 	public HashMap<String, String[]> getCipherTextData(BitSet[] mArray, BitSet key, char algorithm){
 		int iterations = mArray.length;
 		
-		List<Integer> pi = generatePi();
-		
 		BitSet[] ivArray = new BitSet[ iterations ];
 		BitSet[] oArray = new BitSet[ iterations ];
 		BitSet[] tArray = new BitSet[ iterations ];
@@ -77,7 +75,7 @@ public class CFBMode {
 			
 			System.out.println( (j+1) + "\t" + 
 								bH.convertBSToString(ivArray[j], N_SIZE) + "\t" +
-								bH.convertBSToString(oArray[j], N_SIZE) + "\t" + 
+								bH.convertBSToString(oArray[j], N_SIZE) + "\t" +
 								bH.convertBSToString(tArray[j], R_SIZE) + "\t" +
 								bH.convertBSToString(mArray[reverseIndex - j], R_SIZE) + "\t" +
 								bH.convertBSToString(cArray[j], R_SIZE) + "\t");
@@ -107,8 +105,8 @@ public class CFBMode {
 		map.put(CIPHER_TEXT, cipherText);
 		map.put(IV, iv);
 		map.put(M_SIZE, String.valueOf(numberOfBits));
-		
-		return map;
+
+        return map;
 	}
 	
 	public HashMap<String, String[]> getDecipherTextData(BitSet[] cArray, BitSet iv, BitSet key, char algorithm) {
@@ -133,7 +131,7 @@ public class CFBMode {
 			
 			System.out.println( (j+1) + "\t" + 
 								bH.convertBSToString(ivArray[j], N_SIZE) + "\t" +
-								bH.convertBSToString(oArray[j], N_SIZE) + "\t" + 
+								bH.convertBSToString(oArray[j], N_SIZE) + "\t" +
 								bH.convertBSToString(tArray[j], R_SIZE) + "\t" +
 								bH.convertBSToString(cArray[reverseIndex - j], R_SIZE) + "\t" +
 								bH.convertBSToString(mArray[j], R_SIZE) + "\t");
@@ -352,14 +350,14 @@ public class CFBMode {
         BitSet cipherText = bH.bsFromString(cipherData.get(CIPHER_TEXT));
         BitSet iv = bH.bsFromString(cipherData.get(IV));
         int numBits = Integer.valueOf(cipherData.get(M_SIZE));
+        int cipherSize = cipherData.get(CIPHER_TEXT).length();
         BitSet key = bH.bsFromString(cipherData.get(KEY));
 
         CFBMode cfb = new CFBMode();
         cfb.N_SIZE = 64;
         cfb.R_SIZE = cfb.N_SIZE - 1;
 
-        // TODO: Fix plainSize argument to match the real plain size
-        return cfb.getDecipherText(cipherText, iv, numBits, numBits, key, 'd');
+        return cfb.getDecipherText(cipherText, iv, cipherSize, numBits, key, 'd');
     }
 
     /**
@@ -388,12 +386,12 @@ public class CFBMode {
         BitSet cipherText = bH.bsFromString(cipherData.get(CIPHER_TEXT));
         BitSet iv = bH.bsFromString(cipherData.get(IV));
         int numBits = Integer.valueOf(cipherData.get(M_SIZE));
+        int cipherSize = cipherData.get(CIPHER_TEXT).length();
         BitSet key = bH.bsFromString(cipherData.get(KEY));
 
         CFBMode cfb = configureCFBForAES(aesType);
 
-        // TODO: Fix plainSize argument to match the real plain size
-        return cfb.getDecipherText(cipherText, iv, numBits, numBits, key, 'a');
+        return cfb.getDecipherText(cipherText, iv, cipherSize, numBits, key, 'a');
     }
 
     /**
@@ -459,6 +457,7 @@ public class CFBMode {
 
         cipherData = encryptAES("AES es demaaaaaasiaaaaaadoooooo fácil asjkdnakjsdn", 128);
         plainText = decryptAES(cipherData, 128);
+        System.out.println(retrievePlainMessage(plainText));
     }
 
 }
