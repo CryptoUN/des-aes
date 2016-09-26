@@ -85,5 +85,41 @@ public class BitsHandler {
 		}
 	    return binary;
 	}
+
+	public int[] convertBitStringToIntArray(String bitString) {
+        int blockSize = 8;
+        int[] intArray = new int[bitString.length()/blockSize];
+        String subsection;
+        int start, end;
+        for (int i = 0; i < intArray.length; ++i) {
+            start = i * blockSize;
+            end = start + blockSize;
+            subsection = bitString.substring(start, end);
+            intArray[i] = Integer.parseInt(subsection, 2);
+        }
+        return intArray;
+    }
+
+    public String convertIntArrayToBitString(int[] intArray) {
+        int blockSize = 8;
+        String element;
+        StringBuilder bitString = new StringBuilder();
+        for (int i = 0; i < intArray.length; ++i) {
+            element = Integer.toBinaryString(intArray[i]);
+            element = padZerosToLeft(element, blockSize);
+            bitString.append(element.substring(element.length() - blockSize, element.length()));
+        }
+        return  bitString.toString();
+    }
+
+    private static String padZerosToLeft(String string, int desiredSize) {
+        if (string.length() == desiredSize)
+            return string;
+        StringBuilder paddedString = new StringBuilder(string).reverse();
+        for (int i = 0; i < desiredSize - string.length(); i++) {
+            paddedString.append('0');
+        }
+        return paddedString.reverse().toString();
+    }
 	
 }
