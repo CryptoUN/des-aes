@@ -3,6 +3,7 @@ package aes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static aes.AESCipher.prepareMessage;
 import static aes.AuxTransformations.*;
@@ -25,6 +26,29 @@ public class KeyGenerator {
         }
 
         return word;
+    }
+
+    static int[] generateInitialKey(AESCipher.Type type) {
+
+        int n = 16;
+        int[] key;
+        switch (type) {
+            case AES128:
+                break;
+            case AES192:
+                n = 24;
+                break;
+            case AES256:
+                n = 32;
+        }
+
+        key = new int[n];
+        Random rnd = new Random();
+        for (int i = 0; i < n; i++) {
+            key[i] = rnd.nextInt(256);
+        }
+
+        return key;
     }
 
     /**
